@@ -1,28 +1,65 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useVideoPlayer, VideoView } from "expo-video";
 import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+import { useVideoPlayer, VideoView } from "expo-video";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { Post } from "@/types/types";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 
-export default function PostListItem() {
-  const insets = useSafeAreaInsets();
+type VideoItemProps = {
+  postItem: Post;
+  isActive: boolean;
+};
 
-  const videoSource =
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+export default function PostListItem({ postItem, isActive }: VideoItemProps) {
+  const { top, bottom } = useSafeAreaInsets();
+  const { height } = Dimensions.get("window");
+  const { video_url, description, user, nrOfLikes, nrOfComments, nrOfShares } =
+    postItem;
 
-  const player = useVideoPlayer(videoSource, (player) => {
+  const player = useVideoPlayer(video_url, (player) => {
     player.loop = true;
     player.play();
   });
 
+  useFocusEffect(
+    // useFocusEffect is a hook that allows us to play/pause the video when the screen is focused/unfocused
+    useCallback(() => {
+      if (!player) return;
+
+      try {
+        if (isActive) {
+          player.play();
+        } else {
+          player.pause();
+        }
+      } catch (error) {
+        console.error("Error playing/pausing video: ", error);
+      }
+
+      return () => {
+        try {
+          if (player && isActive) {
+            player.pause();
+          }
+        } catch (error) {
+          console.error("Error playing/pausing video on unmount: ", error);
+        }
+      };
+    }, [isActive, player])
+  );
+
   return (
-    <SafeAreaView
+    <View
       style={{
-        flex: 1,
+        height: height - (top + bottom),
       }}
-      edges={["top", "left", "right"]}
     >
       <VideoView
         player={player}
@@ -31,13 +68,15 @@ export default function PostListItem() {
         nativeControls={false}
       />
 
-      <View style={[styles.interactionBar, { bottom: insets.bottom }]}>
+      <View style={[styles.interactionBar, { bottom }]}>
         <TouchableOpacity
           style={styles.interactionButton}
           onPress={() => console.log("like")}
         >
           <Ionicons name="heart" size={33} color="white" />
-          <Text style={styles.interactionText}>0</Text>
+          <Text style={styles.interactionText}>
+            {nrOfLikes?.[0]?.count || 0}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -45,7 +84,9 @@ export default function PostListItem() {
           onPress={() => console.log("comment")}
         >
           <Ionicons name="chatbubble" size={33} color="white" />
-          <Text style={styles.interactionText}>0</Text>
+          <Text style={styles.interactionText}>
+            {nrOfComments?.[0]?.count || 0}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -53,7 +94,9 @@ export default function PostListItem() {
           onPress={() => console.log("share")}
         >
           <Ionicons name="arrow-redo" size={33} color="white" />
-          <Text style={styles.interactionText}>20</Text>
+          <Text style={styles.interactionText}>
+            {nrOfShares?.[0]?.count || 0}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -61,16 +104,18 @@ export default function PostListItem() {
           onPress={() => console.log("profile")}
         >
           <View>
-            <Text style={styles.avatarText}>J</Text>
+            <Text style={styles.avatarText}>
+              {user?.username?.charAt(0)?.toUpperCase()}
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.videoInfo, { bottom: insets.bottom }]}>
-        <Text style={styles.username}>Jake</Text>
-        <Text style={styles.description}>Some random description</Text>
+      <View style={[styles.videoInfo, { bottom }]}>
+        <Text style={styles.username}>{user.username}</Text>
+        <Text style={styles.description}>{description}</Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -109,7 +154,6 @@ const styles = StyleSheet.create({
 
   videoInfo: {
     position: "absolute",
-    bottom: 80,
     left: 20,
     right: 100,
     gap: 5,
