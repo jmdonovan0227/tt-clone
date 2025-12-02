@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import {
   SafeAreaView,
@@ -13,7 +7,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 export default function PostListItem() {
-  const { height } = Dimensions.get("window");
   const insets = useSafeAreaInsets();
 
   const videoSource =
@@ -25,7 +18,12 @@ export default function PostListItem() {
   });
 
   return (
-    <SafeAreaView style={{ height: height - insets.bottom }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}
+      edges={["top", "left", "right"]}
+    >
       <VideoView
         player={player}
         contentFit="cover"
@@ -33,7 +31,7 @@ export default function PostListItem() {
         nativeControls={false}
       />
 
-      <View style={styles.interactionBar}>
+      <View style={[styles.interactionBar, { bottom: insets.bottom }]}>
         <TouchableOpacity
           style={styles.interactionButton}
           onPress={() => console.log("like")}
@@ -68,7 +66,7 @@ export default function PostListItem() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.videoInfo}>
+      <View style={[styles.videoInfo, { bottom: insets.bottom }]}>
         <Text style={styles.username}>Jake</Text>
         <Text style={styles.description}>Some random description</Text>
       </View>
@@ -80,7 +78,6 @@ const styles = StyleSheet.create({
   interactionBar: {
     position: "absolute", // on top of video
     right: 20,
-    bottom: 80,
     alignItems: "center",
     gap: 25,
   },
