@@ -111,7 +111,7 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.videoInfo, { bottom: bottom + 80 }]}>
+      <View style={[styles.videoInfo, { bottom }]}>
         <Text style={styles.username}>{user.username}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
