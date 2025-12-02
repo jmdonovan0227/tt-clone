@@ -74,7 +74,9 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
           onPress={() => console.log("like")}
         >
           <Ionicons name="heart" size={33} color="white" />
-          <Text style={styles.interactionText}>{nrOfLikes[0].count || 0}</Text>
+          <Text style={styles.interactionText}>
+            {nrOfLikes?.[0]?.count || 0}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -83,7 +85,7 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         >
           <Ionicons name="chatbubble" size={33} color="white" />
           <Text style={styles.interactionText}>
-            {nrOfComments[0].count || 0}
+            {nrOfComments?.[0]?.count || 0}
           </Text>
         </TouchableOpacity>
 
@@ -92,7 +94,9 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
           onPress={() => console.log("share")}
         >
           <Ionicons name="arrow-redo" size={33} color="white" />
-          <Text style={styles.interactionText}>{nrOfShares[0].count || 0}</Text>
+          <Text style={styles.interactionText}>
+            {nrOfShares?.[0]?.count || 0}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -101,13 +105,13 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         >
           <View>
             <Text style={styles.avatarText}>
-              {user.username.charAt(0).toUpperCase()}
+              {user?.username?.charAt(0)?.toUpperCase()}
             </Text>
           </View>
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.videoInfo, { bottom }]}>
+      <View style={[styles.videoInfo, { bottom: bottom + 80 }]}>
         <Text style={styles.username}>{user.username}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
@@ -150,7 +154,6 @@ const styles = StyleSheet.create({
 
   videoInfo: {
     position: "absolute",
-    bottom: 80,
     left: 20,
     right: 100,
     gap: 5,

@@ -32,6 +32,9 @@ export default function HomeScreen() {
         decelerationRate="fast" // faster snapping
         disableIntervalMomentum // disable momentum when scrolling so we don't skip multiple items when scrolling
         onViewableItemsChanged={onViewableItemsChanged.current}
+        viewabilityConfig={{
+          itemVisiblePercentThreshold: 50, // 50% of the item must be visible to be considered as visible
+        }}
       />
     </View>
   );
