@@ -103,6 +103,7 @@ const NewPost = () => {
   const startRecording = async () => {
     if (!cameraRef.current || !cameraRef) {
       console.error("❌ Camera reference is not available");
+      return;
     }
 
     try {
@@ -155,7 +156,7 @@ const NewPost = () => {
           ref={cameraRef}
         />
 
-        <View style={styles.tobBar}>
+        <View style={styles.topBar}>
           <Ionicons
             name="close"
             size={40}
@@ -266,7 +267,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F44336",
   },
 
-  tobBar: {
+  topBar: {
     position: "absolute",
     top: 55,
     left: 10,
