@@ -29,6 +29,7 @@ export default function TabLayout() {
         name="newPost"
         options={{
           title: "New Post",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Feather name="plus-square" color={color} size={size} />
           ),
