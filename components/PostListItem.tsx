@@ -29,6 +29,7 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
   });
 
   useFocusEffect(
+    // if we used tab navigation without the useFocusEffect, the video would not play/pause when the tab is changed
     // useFocusEffect is a hook that allows us to play/pause the video when the screen is focused/unfocused
     useCallback(() => {
       if (!player) return;
@@ -65,7 +66,7 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         player={player}
         contentFit="cover"
         style={{ flex: 1 }}
-        nativeControls={false}
+        // nativeControls={false}
       />
 
       <View style={[styles.interactionBar, { bottom }]}>
