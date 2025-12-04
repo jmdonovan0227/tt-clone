@@ -20,6 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as ImagePicker from "expo-image-picker";
 
 const NewPost = () => {
   const [facing, setFacing] = useState<CameraType>("back");
@@ -80,40 +81,64 @@ const NewPost = () => {
     setFacing((currentFacing) => (currentFacing === "back" ? "front" : "back"));
   };
 
-  const selectFromGallery = () => {
-    console.log("selectFromGallery");
-  };
+  const selectFromGallery = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["videos"], // only allow videos to be selected
+        allowsEditing: true,
+        aspect: [9, 16], // 9:16 aspect ratio for the video
+      });
 
-  // console.log("video player: ", videoPlayer);
-  // console.log("video: ", video);
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        setVideo(uri);
+        await videoPlayer.replaceAsync(uri);
+        videoPlayer.play();
+      }
+    } catch (error) {
+      console.error("❌ Error selecting from gallery: ", error);
+    }
+  };
 
   const startRecording = async () => {
     if (!cameraRef.current || !cameraRef) {
       console.error("❌ Camera reference is not available");
     }
-    setIsRecording(true);
-    const recordedVideo = await cameraRef.current?.recordAsync();
 
-    if (recordedVideo?.uri) {
-      const uri = recordedVideo.uri; // get the uri of the recorded video
-      console.log("Video recorded successfully: ", recordedVideo.uri);
-      setVideo(uri); // set the video to the new video
-      await videoPlayer.replaceAsync(uri); // replace the video with the new video
-      videoPlayer.play(); // play the video
-    } else {
-      console.log("Failed to record video");
-      setVideo(null);
+    try {
+      setIsRecording(true);
+      const recordedVideo = await cameraRef.current?.recordAsync();
+
+      if (recordedVideo?.uri) {
+        const uri = recordedVideo.uri; // get the uri of the recorded video
+        setVideo(uri); // set the video to the new video
+        await videoPlayer.replaceAsync(uri); // replace the video with the new video
+        videoPlayer.play(); // play the video
+      } else {
+        console.log("Failed to record video");
+        setVideo(null);
+      }
+    } catch (error) {
+      console.error("❌ Error recording video: ", error);
     }
   };
 
   const stopRecording = () => {
-    setIsRecording(false);
-    cameraRef.current?.stopRecording();
+    try {
+      setIsRecording(false);
+      cameraRef.current?.stopRecording();
+    } catch (error) {
+      console.error("❌ Error stopping recording: ", error);
+    }
   };
 
   const dismissVideo = () => {
-    setVideo(null); // remove the video url
-    videoPlayer.release(); // this video player is no longer needed so we release it
+    try {
+      setVideo(null); // remove the video url
+      videoPlayer.release(); // this video player is no longer needed so we release it
+    } catch (error) {
+      console.error("❌ Error dismissing video: ", error);
+    }
   };
 
   const postVideo = () => {
