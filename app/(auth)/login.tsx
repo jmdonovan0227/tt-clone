@@ -5,6 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
@@ -58,7 +60,10 @@ const Login = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={styles.container}
+    >
       <Text style={styles.title}>Welcome Back!</Text>
       <Text style={styles.subtitle}>Sign in to your account</Text>
 
@@ -96,8 +101,14 @@ const Login = () => {
         name="password"
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-        <Text style={styles.buttonText}>Sign In</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleSubmit(onSubmit)}
+        disabled={isLoading}
+      >
+        <Text style={styles.buttonText}>
+          {isLoading ? "Signing in..." : "Sign In"}
+        </Text>
       </TouchableOpacity>
 
       <View style={styles.footer}>
@@ -106,7 +117,7 @@ const Login = () => {
           <Text style={styles.linkText}>Sign Up</Text>
         </Link>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
