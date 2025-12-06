@@ -46,6 +46,8 @@ export const useAuthStore = create<AuthStore>()(
             }
           }
         } catch (error) {
+          console.error("Error logging in: ", error);
+          set({ user: null, isAuthenticated: false }); // clear user even if error occurs
           throw error;
         }
       },
@@ -82,6 +84,8 @@ export const useAuthStore = create<AuthStore>()(
             throw error;
           }
         } catch (error) {
+          console.error("Error registering: ", error);
+          set({ user: null, isAuthenticated: false }); // clear user even if error occurs
           throw error;
         }
       },
@@ -95,6 +99,8 @@ export const useAuthStore = create<AuthStore>()(
             throw error;
           }
         } catch (error) {
+          console.error("Error logging out: ", error);
+          set({ user: null, isAuthenticated: false }); // clear user even if error occurs
           throw error;
         }
       },
