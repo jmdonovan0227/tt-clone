@@ -1,7 +1,8 @@
 import { AppState } from "react-native";
 import "react-native-url-polyfill/auto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createClient, processLock } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
+import { processLock } from "@supabase/auth-js";
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!; // EXPO_PUBLIC is needed to access the environment variables from the frontend
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!; // Remember: ! is used to tell the compiler that the environment variable is not null

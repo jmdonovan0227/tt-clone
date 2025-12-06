@@ -28,7 +28,11 @@ export const useAuthStore = create<AuthStore>()(
             password,
           });
 
-          if (data && data.user && !error) {
+          if (error) {
+            throw error;
+          }
+
+          if (data && data.user) {
             const { user } = data;
 
             if (user.email && user.id && user.user_metadata.username) {
@@ -58,7 +62,11 @@ export const useAuthStore = create<AuthStore>()(
             },
           });
 
-          if (data && data.user && !error) {
+          if (error) {
+            throw error;
+          }
+
+          if (data && data.user) {
             const { user } = data;
 
             if (user.email && user.id && user.user_metadata.username) {
@@ -78,10 +86,16 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
       logout: async () => {
-        const { error } = await supabase.auth.signOut();
+        try {
+          const { error } = await supabase.auth.signOut();
 
-        if (!error) {
-          set({ user: null, isAuthenticated: false });
+          if (!error) {
+            set({ user: null, isAuthenticated: false });
+          } else {
+            throw error;
+          }
+        } catch (error) {
+          throw error;
         }
       },
     }),
