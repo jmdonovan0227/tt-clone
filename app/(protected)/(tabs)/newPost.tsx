@@ -7,6 +7,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import {
@@ -21,8 +22,13 @@ import { useRouter } from "expo-router";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuthStore } from "@/stores/useAuthStore";
+import * as FileSystem from "expo-file-system";
+import { uploadVideoToStorage, createPost } from "@/services/posts";
 
 const NewPost = () => {
+  const queryClient = useQueryClient();
   const [facing, setFacing] = useState<CameraType>("back");
   const [isRecording, setIsRecording] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
@@ -32,6 +38,58 @@ const NewPost = () => {
   const [description, setDescription] = useState("");
   const router = useRouter();
   const cameraRef = useRef<CameraView>(null);
+  const user = useAuthStore((state) => state.user);
+
+  const { mutate: createNewPost, isPending } = useMutation({
+    mutationFn: async ({
+      video,
+      description,
+    }: {
+      video: string;
+      description: string;
+    }) => {
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      const fileExtension = video.split(".").pop() || "mp4";
+      const fileName = `${user?.id}/${Date.now()}.${fileExtension}`;
+      const file = new FileSystem.File(video);
+      const fileBuffer = await file.bytes();
+
+      if (!fileBuffer) {
+        throw new Error("Failed to read video file");
+      }
+
+      const videoUrl = await uploadVideoToStorage({
+        fileName,
+        fileExtension,
+        fileBuffer,
+      });
+      await createPost({
+        video_url: videoUrl,
+        description,
+        user_id: user?.id,
+      });
+    },
+
+    onSuccess: () => {
+      // refetch the posts
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      videoPlayer.release();
+      setDescription("");
+      setVideo(null);
+      router.replace("/");
+    },
+
+    onError: (error) => {
+      Alert.alert(
+        "Error",
+        error.message || "Something went wrong while creating the post!"
+      );
+    },
+  });
+
   const videoPlayer = useVideoPlayer(null, (player) => {
     player.loop = true;
   });
@@ -143,7 +201,12 @@ const NewPost = () => {
   };
 
   const postVideo = () => {
-    console.log("postVideo");
+    if (!video) {
+      Alert.alert("Error", "Please record or select a video to post!");
+      return;
+    }
+
+    createNewPost({ video, description });
   };
 
   const renderCamera = () => {
@@ -227,7 +290,11 @@ const NewPost = () => {
             multiline
           />
 
-          <TouchableOpacity style={styles.postButton} onPress={postVideo}>
+          <TouchableOpacity
+            style={[styles.postButton, isPending && { opacity: 0.5 }]}
+            disabled={isPending}
+            onPress={postVideo}
+          >
             <Text style={styles.postText}>Post</Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>

@@ -20,8 +20,7 @@ type VideoItemProps = {
 export default function PostListItem({ postItem, isActive }: VideoItemProps) {
   const { top, bottom } = useSafeAreaInsets();
   const { height } = Dimensions.get("window");
-  const { video_url, description, user, nrOfLikes, nrOfComments, nrOfShares } =
-    postItem;
+  const { video_url, description, user, nrOfComments } = postItem;
 
   const player = useVideoPlayer(video_url, (player) => {
     player.loop = true;
@@ -65,19 +64,16 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
       <VideoView
         player={player}
         contentFit="cover"
-        style={{ flex: 1 }}
-        // nativeControls={false}
+        style={{ flex: 1, marginBottom: 10 }}
       />
 
-      <View style={[styles.interactionBar, { bottom }]}>
+      <View style={[styles.interactionBar, { bottom: bottom + 25 }]}>
         <TouchableOpacity
           style={styles.interactionButton}
           onPress={() => console.log("like")}
         >
           <Ionicons name="heart" size={33} color="white" />
-          <Text style={styles.interactionText}>
-            {nrOfLikes?.[0]?.count || 0}
-          </Text>
+          <Text style={styles.interactionText}>{0}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -95,9 +91,7 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
           onPress={() => console.log("share")}
         >
           <Ionicons name="arrow-redo" size={33} color="white" />
-          <Text style={styles.interactionText}>
-            {nrOfShares?.[0]?.count || 0}
-          </Text>
+          <Text style={styles.interactionText}>{0}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -112,7 +106,7 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.videoInfo, { bottom }]}>
+      <View style={[styles.videoInfo, { bottom: bottom + 25 }]}>
         <Text style={styles.username}>{user.username}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>

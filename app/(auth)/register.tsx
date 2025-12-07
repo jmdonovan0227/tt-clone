@@ -80,6 +80,7 @@ const Register = () => {
             placeholderTextColor="#666"
             onBlur={onBlur}
             value={value}
+            autoCapitalize="none"
           />
         )}
         name="username"
@@ -97,6 +98,7 @@ const Register = () => {
             onBlur={onBlur}
             value={value}
             keyboardType="email-address"
+            autoCapitalize="none"
           />
         )}
         name="email"

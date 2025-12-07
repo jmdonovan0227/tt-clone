@@ -4,13 +4,16 @@ import {
   Dimensions,
   ViewToken,
   StyleSheet,
+  ActivityIndicator,
+  Text,
 } from "react-native";
 import PostListItem from "@/components/PostListItem";
-import posts from "@/assets/data/posts.json";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import FeedTab from "@/components/GenericComponents/FeedTab";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { fetchPosts } from "@/services/posts";
 
 const TABS = {
   EXPLORE: "Explore",
@@ -23,6 +26,31 @@ const TABS = {
 // for the app to work properly as when you install dep not included in expo go/edit app.json config,
 // you may have to generate binaries.
 export default function HomeScreen() {
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["posts"],
+    queryFn: ({ pageParam }) => fetchPosts(pageParam),
+    initialPageParam: { limit: 3, cursor: undefined },
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length === 0) {
+        return undefined;
+      }
+
+      return {
+        limit: 3,
+        cursor: lastPage[lastPage.length - 1].id,
+      };
+    },
+  });
+
+  const posts = useMemo(() => data?.pages.flat() || [], [data]);
+
   const { height } = Dimensions.get("window");
   const { top, bottom } = useSafeAreaInsets();
   // set current video index
@@ -37,6 +65,32 @@ export default function HomeScreen() {
       }
     }
   );
+
+  if (isLoading) {
+    return (
+      <ActivityIndicator
+        size="large"
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text
+          style={{
+            color: "white",
+            fontWeight: "bold",
+            textAlign: "center",
+            fontSize: 18,
+          }}
+        >
+          Error occurred while fetching posts: {error.message}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -68,7 +122,7 @@ export default function HomeScreen() {
         renderItem={({ item, index }) => (
           <PostListItem postItem={item} isActive={index === currentIndex} />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
         snapToInterval={height - (top + bottom)} // snap to the height of the screen minus the safe area insets
         decelerationRate="fast" // faster snapping
@@ -77,6 +131,18 @@ export default function HomeScreen() {
         viewabilityConfig={{
           itemVisiblePercentThreshold: 50, // 50% of the item must be visible to be considered as visible
         }}
+        onEndReached={() =>
+          !isFetchingNextPage && hasNextPage && fetchNextPage()
+        }
+        onEndReachedThreshold={2} // 2 spaces from the end.
+        getItemLayout={(data, index) => ({
+          length: height - (top + bottom),
+          offset: (height - (top + bottom)) * index,
+          index,
+        })} // this is used to improve the performance of the FlatList by providing a layout for the
+        initialNumToRender={3} // render 3 items initially (helps with performance)
+        maxToRenderPerBatch={3} // render 3 items per batch (helps with performance)
+        windowSize={5} // render 5 items before and after the current item (helps with performance)
       />
     </View>
   );
