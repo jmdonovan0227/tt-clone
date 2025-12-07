@@ -65,7 +65,6 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         player={player}
         contentFit="cover"
         style={{ flex: 1, marginBottom: 10 }}
-        nativeControls={true}
       />
 
       <View style={[styles.interactionBar, { bottom: bottom + 25 }]}>
