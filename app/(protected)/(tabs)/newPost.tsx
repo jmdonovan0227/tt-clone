@@ -48,23 +48,29 @@ const NewPost = () => {
       video: string;
       description: string;
     }) => {
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       const fileExtension = video.split(".").pop() || "mp4";
       const fileName = `${user?.id}/${Date.now()}.${fileExtension}`;
       const file = new FileSystem.File(video);
       const fileBuffer = await file.bytes();
 
-      if (user && fileBuffer) {
-        const videoUrl = await uploadVideoToStorage({
-          fileName,
-          fileExtension,
-          fileBuffer,
-        });
-        await createPost({
-          video_url: videoUrl,
-          description,
-          user_id: user?.id,
-        });
+      if (!fileBuffer) {
+        throw new Error("Failed to read video file");
       }
+
+      const videoUrl = await uploadVideoToStorage({
+        fileName,
+        fileExtension,
+        fileBuffer,
+      });
+      await createPost({
+        video_url: videoUrl,
+        description,
+        user_id: user?.id,
+      });
     },
 
     onSuccess: () => {
@@ -76,8 +82,11 @@ const NewPost = () => {
       router.replace("/");
     },
 
-    onError: () => {
-      Alert.alert("Error", "Something went wrong while creating the post!");
+    onError: (error) => {
+      Alert.alert(
+        "Error",
+        error.message || "Something went wrong while creating the post!"
+      );
     },
   });
 
@@ -281,7 +290,11 @@ const NewPost = () => {
             multiline
           />
 
-          <TouchableOpacity style={styles.postButton} onPress={postVideo}>
+          <TouchableOpacity
+            style={[styles.postButton, isPending && { opacity: 0.5 }]}
+            disabled={isPending}
+            onPress={postVideo}
+          >
             <Text style={styles.postText}>Post</Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>

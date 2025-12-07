@@ -32,11 +32,12 @@ export const fetchPosts = async (pageParams: PaginationInput) => {
 
 export const uploadVideoToStorage = async (storageProps: StorageInput) => {
   const { fileName, fileExtension, fileBuffer } = storageProps;
+  const sanitizedFileExtension = fileExtension.replace(/^\./, "").toLowerCase();
 
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from("videos")
     .upload(fileName, fileBuffer, {
-      contentType: `video/${fileExtension}`,
+      contentType: `video/${sanitizedFileExtension}`,
     });
 
   if (error) {
@@ -50,14 +51,7 @@ export const uploadVideoToStorage = async (storageProps: StorageInput) => {
 };
 
 export const createPost = async (newPosts: PostInput) => {
-  const { data, error } = await supabase
-    .from("posts")
-    .insert(newPosts)
-    .throwOnError();
-
-  if (error) {
-    throw error;
-  }
+  const { data } = await supabase.from("posts").insert(newPosts).throwOnError();
 
   return data;
 };

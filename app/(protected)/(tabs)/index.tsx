@@ -86,7 +86,7 @@ export default function HomeScreen() {
             fontSize: 18,
           }}
         >
-          Error occured while fetching posts: {error.message}
+          Error occurred while fetching posts: {error.message}
         </Text>
       </View>
     );
