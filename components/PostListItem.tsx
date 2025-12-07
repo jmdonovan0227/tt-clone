@@ -64,11 +64,11 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
       <VideoView
         player={player}
         contentFit="cover"
-        style={{ flex: 1 }}
-        // nativeControls={false}
+        style={{ flex: 1, marginBottom: 10 }}
+        nativeControls={true}
       />
 
-      <View style={[styles.interactionBar, { bottom }]}>
+      <View style={[styles.interactionBar, { bottom: bottom + 25 }]}>
         <TouchableOpacity
           style={styles.interactionButton}
           onPress={() => console.log("like")}
@@ -107,7 +107,7 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.videoInfo, { bottom }]}>
+      <View style={[styles.videoInfo, { bottom: bottom + 25 }]}>
         <Text style={styles.username}>{user.username}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>

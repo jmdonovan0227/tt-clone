@@ -136,8 +136,8 @@ export default function HomeScreen() {
         }
         onEndReachedThreshold={2} // 2 spaces from the end.
         getItemLayout={(data, index) => ({
-          length: height - 80,
-          offset: (height - 80) * index,
+          length: height - (top + bottom),
+          offset: (height - (top + bottom)) * index,
           index,
         })} // this is used to improve the performance of the FlatList by providing a layout for the
         initialNumToRender={3} // render 3 items initially (helps with performance)
