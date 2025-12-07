@@ -5,12 +5,15 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import * as SplashScreen from "expo-splash-screen";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // prevent the splash screen from auto hiding while we wait for the store to be hydrated
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   useSupabaseAuth(); // this is used to tell Supabase Auth to continuously refresh the session automatically if the app is in the foreground
+
+  const queryClient = new QueryClient();
 
   // hydration is the process of loading the store from the persisted state
   // hydration can be done synchronously or asynchronously
@@ -58,10 +61,12 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider value={myTheme}>
-        <Stack>
-          <Stack.Screen name="(protected)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        </Stack>
+        <QueryClientProvider client={queryClient}>
+          <Stack>
+            <Stack.Screen name="(protected)" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          </Stack>
+        </QueryClientProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

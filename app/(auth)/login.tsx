@@ -79,6 +79,7 @@ const Login = () => {
             onBlur={onBlur}
             value={value}
             keyboardType="email-address"
+            autoCapitalize="none"
           />
         )}
         name="email"
@@ -96,6 +97,7 @@ const Login = () => {
             onBlur={onBlur}
             value={value}
             secureTextEntry={true}
+            autoCapitalize="none"
           />
         )}
         name="password"
