@@ -9,7 +9,7 @@ import { useVideoPlayer, VideoView } from "expo-video";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Post } from "@/types/types";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, Link } from "expo-router";
 import { useCallback } from "react";
 
 type VideoItemProps = {
@@ -76,15 +76,14 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
           <Text style={styles.interactionText}>{0}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.interactionButton}
-          onPress={() => console.log("comment")}
-        >
-          <Ionicons name="chatbubble" size={33} color="white" />
-          <Text style={styles.interactionText}>
-            {nrOfComments?.[0]?.count || 0}
-          </Text>
-        </TouchableOpacity>
+        <Link href={`/postComments/${postItem.id}`} asChild>
+          <TouchableOpacity style={styles.interactionButton}>
+            <Ionicons name="chatbubble" size={33} color="white" />
+            <Text style={styles.interactionText}>
+              {nrOfComments?.[0]?.count || 0}
+            </Text>
+          </TouchableOpacity>
+        </Link>
 
         <TouchableOpacity
           style={styles.interactionButton}
