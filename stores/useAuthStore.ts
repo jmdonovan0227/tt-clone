@@ -3,6 +3,7 @@ import { User } from "@/types/types";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/lib/supabase";
+import { queryClient } from "@/app/_layout";
 
 type AuthStore = {
   user: User | null;
@@ -95,12 +96,14 @@ export const useAuthStore = create<AuthStore>()(
 
           if (!error) {
             set({ user: null, isAuthenticated: false });
+            queryClient.clear(); // clear the query cache
           } else {
             throw error;
           }
         } catch (error) {
           console.error("Error logging out: ", error);
           set({ user: null, isAuthenticated: false }); // clear user even if error occurs
+          queryClient.clear(); // clear the query cache
           throw error;
         }
       },

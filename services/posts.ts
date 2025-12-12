@@ -15,7 +15,9 @@ type PaginationInput = {
 export const fetchPosts = async (pageParams: PaginationInput) => {
   let query = supabase
     .from("posts")
-    .select(`*, user:profiles(*), nrOfComments:comments(count)`)
+    .select(
+      `*, user:profiles(*), nrOfComments:comments(count), nrOfLikes:likes(count)`
+    )
     .order("id", { ascending: false });
 
   if (pageParams.limit) {
@@ -27,6 +29,7 @@ export const fetchPosts = async (pageParams: PaginationInput) => {
   }
 
   const { data } = await query.throwOnError();
+  console.log("data in fetchPosts: ", data);
   return data;
 };
 

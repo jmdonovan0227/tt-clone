@@ -10,22 +10,53 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Post } from "@/types/types";
 import { useFocusEffect, Link } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 type VideoItemProps = {
   postItem: Post;
   isActive: boolean;
 };
 
+type LikeRecord = {
+  id: string;
+  post_id: string;
+  user_id: string;
+  created_at: string;
+};
+
 export default function PostListItem({ postItem, isActive }: VideoItemProps) {
   const { top, bottom } = useSafeAreaInsets();
   const { height } = Dimensions.get("window");
-  const { video_url, description, user, nrOfComments } = postItem;
+  const {
+    video_url,
+    description,
+    user: postUser,
+    nrOfComments,
+    nrOfLikes,
+  } = postItem;
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeRecord, setLikeRecord] = useState<LikeRecord | null>(null);
+  const [likeCount, setLikeCount] = useState(nrOfLikes?.[0]?.count || 0);
+  const user = useAuthStore((state) => state.user);
 
   const player = useVideoPlayer(video_url, (player) => {
     player.loop = true;
     player.play();
   });
+
+  useEffect(() => {
+    fetchLikeStatus();
+  }, []);
+
+  useEffect(() => {
+    if (isLiked) {
+      saveLike();
+    } else {
+      removeLike();
+    }
+  }, [isLiked]);
 
   useFocusEffect(
     // if we used tab navigation without the useFocusEffect, the video would not play/pause when the tab is changed
@@ -55,6 +86,71 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
     }, [isActive, player])
   );
 
+  // function to fetch the like status for the post for the current user
+  const fetchLikeStatus = async () => {
+    try {
+      const { data: likeRecord, error: fetchError } = await supabase
+        .from("likes")
+        .select(`*`, { count: "exact" })
+        .eq("post_id", postItem.id)
+        .eq("user_id", user?.id)
+        .single();
+
+      if (likeRecord && !fetchError) {
+        setLikeRecord(likeRecord);
+        setIsLiked(true);
+      }
+    } catch (error) {
+      console.error("Error fetching likes: ", error);
+    }
+  };
+
+  // create a like for the post for the current user
+  const saveLike = async () => {
+    if (likeRecord || !user) return;
+
+    try {
+      const { data: insertedLikeRecord, error: insertError } = await supabase
+        .from("likes")
+        .insert({
+          post_id: postItem.id,
+          user_id: user.id,
+        })
+        .select("*")
+        .single();
+
+      if (insertedLikeRecord && !insertError) {
+        setLikeCount((prev) => prev + 1);
+        setLikeRecord(insertedLikeRecord);
+        setIsLiked(true);
+      }
+    } catch (error) {
+      console.error("Error saving like: ", error);
+    }
+  };
+
+  // remove a like for the post for the current user
+  const removeLike = async () => {
+    if (!likeRecord || !user) return;
+
+    try {
+      const { error } = await supabase
+        .from("likes")
+        .delete()
+        .eq("id", likeRecord.id);
+
+      console.log("deleteError: ", error);
+
+      if (!error) {
+        setLikeCount((prev) => prev - 1);
+        setLikeRecord(null);
+        setIsLiked(false);
+      }
+    } catch (error) {
+      console.error("Error removing like: ", error);
+    }
+  };
+
   return (
     <View
       style={{
@@ -70,10 +166,14 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
       <View style={[styles.interactionBar, { bottom: bottom + 25 }]}>
         <TouchableOpacity
           style={styles.interactionButton}
-          onPress={() => console.log("like")}
+          onPress={() => setIsLiked(!isLiked)}
         >
-          <Ionicons name="heart" size={33} color="white" />
-          <Text style={styles.interactionText}>{0}</Text>
+          <Ionicons
+            name={isLiked ? "heart" : "heart-outline"}
+            size={33}
+            color="white"
+          />
+          <Text style={styles.interactionText}>{likeCount}</Text>
         </TouchableOpacity>
 
         <Link href={`/postComments/${postItem.id}`} asChild>
@@ -99,14 +199,14 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         >
           <View>
             <Text style={styles.avatarText}>
-              {user?.username?.charAt(0)?.toUpperCase()}
+              {postUser?.username?.charAt(0)?.toUpperCase()}
             </Text>
           </View>
         </TouchableOpacity>
       </View>
 
       <View style={[styles.videoInfo, { bottom: bottom + 25 }]}>
-        <Text style={styles.username}>{user.username}</Text>
+        <Text style={styles.username}>{postUser?.username}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
     </View>
