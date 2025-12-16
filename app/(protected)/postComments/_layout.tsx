@@ -1,7 +1,6 @@
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function PostCommentsLayout() {
-  const router = useRouter();
   return (
     <Stack>
       <Stack.Screen

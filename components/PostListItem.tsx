@@ -71,6 +71,10 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         }
       )
       .subscribe();
+
+    return () => {
+      supabase.removeChannel(likesChannel);
+    };
   }, []);
 
   useEffect(() => {
@@ -116,12 +120,14 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
 
   // function to fetch the like status for the post for the current user
   const fetchLikeStatus = async () => {
+    if (!user) return;
+
     try {
       const { data: fetchedLikeRecord, error: fetchError } = await supabase
         .from("likes")
         .select(`*`, { count: "exact" })
         .eq("post_id", postItem.id)
-        .eq("user_id", user?.id)
+        .eq("user_id", user.id)
         .single();
 
       if (fetchedLikeRecord && !fetchError) {
@@ -170,7 +176,7 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
       if (!error) {
         setLikeRecord(null);
         setIsLiked(false);
-        setLikeCount((prev) => prev - 1);
+        setLikeCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
       console.error("Error removing like: ", error);

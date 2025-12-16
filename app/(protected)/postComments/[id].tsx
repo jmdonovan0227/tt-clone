@@ -61,7 +61,7 @@ export default function PostComments() {
     return () => {
       commentsChannel.unsubscribe();
     };
-  }, []);
+  }, [id, user?.id, queryClient]);
 
   const { data: comments, isLoading } = useQuery({
     queryKey: ["comments", id],

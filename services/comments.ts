@@ -53,7 +53,6 @@ export const getComment = async (commentId: string) => {
 
 // delete a comment by id
 export const deleteComment = async (commentId: string) => {
-  console.log("Deleting comment function called with commentId: ", commentId);
   const { data } = await supabase
     .from("comments")
     .delete()
