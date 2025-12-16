@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // prevent the splash screen from auto hiding while we wait for the store to be hydrated
 SplashScreen.preventAutoHideAsync();
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 export default function RootLayout() {
   useSupabaseAuth(); // this is used to tell Supabase Auth to continuously refresh the session automatically if the app is in the foreground
