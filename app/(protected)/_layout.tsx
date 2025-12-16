@@ -11,14 +11,7 @@ export default function ProtectedLayout() {
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="postComments/[id]"
-        options={{
-          headerShown: true,
-          title: "Comments",
-          headerBackButtonDisplayMode: "minimal",
-        }}
-      />
+      <Stack.Screen name="postComments" options={{ headerShown: false }} />
     </Stack>
   );
 }

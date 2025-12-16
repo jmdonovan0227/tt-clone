@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Post } from "@/types/types";
 import { useFocusEffect, Link } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/useAuthStore";
 
@@ -39,6 +39,8 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeRecord, setLikeRecord] = useState<LikeRecord | null>(null);
   const [likeCount, setLikeCount] = useState(nrOfLikes?.[0]?.count || 0);
+  const isInitializing = useRef(true);
+
   const user = useAuthStore((state) => state.user);
 
   const player = useVideoPlayer(video_url, (player) => {
@@ -51,6 +53,11 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
   }, []);
 
   useEffect(() => {
+    if (isInitializing.current) {
+      isInitializing.current = false;
+      return;
+    }
+
     if (isLiked) {
       saveLike();
     } else {
@@ -89,15 +96,15 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
   // function to fetch the like status for the post for the current user
   const fetchLikeStatus = async () => {
     try {
-      const { data: likeRecord, error: fetchError } = await supabase
+      const { data: fetchedLikeRecord, error: fetchError } = await supabase
         .from("likes")
         .select(`*`, { count: "exact" })
         .eq("post_id", postItem.id)
         .eq("user_id", user?.id)
         .single();
 
-      if (likeRecord && !fetchError) {
-        setLikeRecord(likeRecord);
+      if (fetchedLikeRecord && !fetchError) {
+        setLikeRecord(fetchedLikeRecord);
         setIsLiked(true);
       }
     } catch (error) {
@@ -120,9 +127,9 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         .single();
 
       if (insertedLikeRecord && !insertError) {
-        setLikeCount((prev) => prev + 1);
         setLikeRecord(insertedLikeRecord);
         setIsLiked(true);
+        setLikeCount((prev) => prev + 1);
       }
     } catch (error) {
       console.error("Error saving like: ", error);
@@ -131,20 +138,18 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
 
   // remove a like for the post for the current user
   const removeLike = async () => {
-    if (!likeRecord || !user) return;
+    if (!user || !likeRecord) return;
 
     try {
       const { error } = await supabase
         .from("likes")
         .delete()
-        .eq("id", likeRecord.id);
-
-      console.log("deleteError: ", error);
+        .eq("id", likeRecord?.id);
 
       if (!error) {
-        setLikeCount((prev) => prev - 1);
         setLikeRecord(null);
         setIsLiked(false);
+        setLikeCount((prev) => prev - 1);
       }
     } catch (error) {
       console.error("Error removing like: ", error);

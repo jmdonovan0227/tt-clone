@@ -21,3 +21,14 @@ export const createComment = async (newComment: NewCommentInput) => {
 
   return data;
 };
+
+export const getComment = async (commentId: string) => {
+  const { data } = await supabase
+    .from("comments")
+    .select("*")
+    .eq("id", commentId)
+    .single()
+    .throwOnError();
+
+  return data;
+};

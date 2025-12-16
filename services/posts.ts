@@ -29,7 +29,6 @@ export const fetchPosts = async (pageParams: PaginationInput) => {
   }
 
   const { data } = await query.throwOnError();
-  console.log("data in fetchPosts: ", data);
   return data;
 };
 
