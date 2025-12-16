@@ -157,9 +157,12 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         setLikeRecord(insertedLikeRecord);
         setIsLiked(true);
         setLikeCount((prev) => prev + 1);
+      } else {
+        setIsLiked(false); // rollback
       }
     } catch (error) {
       console.error("Error saving like: ", error);
+      setIsLiked(false); // rollback
     }
   };
 
@@ -177,9 +180,12 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         setLikeRecord(null);
         setIsLiked(false);
         setLikeCount((prev) => Math.max(0, prev - 1));
+      } else {
+        setIsLiked(true); // rollback
       }
     } catch (error) {
       console.error("Error removing like: ", error);
+      setIsLiked(true); // rollback
     }
   };
 

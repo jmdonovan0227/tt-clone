@@ -46,11 +46,7 @@ export default function PostComments() {
           ) {
             // get new comments for other users
             queryClient.invalidateQueries({ queryKey: ["comments", id] });
-          } else if (
-            payload.eventType === "UPDATE" &&
-            payload.new.post_id === Number(id)
-          ) {
-            console.log("Updating comment");
+          } else if (payload.eventType === "UPDATE") {
             // update the comment in the list
             queryClient.invalidateQueries({ queryKey: ["comments", id] });
           }
@@ -110,6 +106,7 @@ export default function PostComments() {
       await deleteCommentMutation.mutateAsync(commentId);
     } catch (error) {
       console.error("Error deleting comment: ", error);
+      Alert.alert("Error deleting comment, please try again.");
     }
   };
 
@@ -220,12 +217,6 @@ const styles = StyleSheet.create({
   commentContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  modal: {
-    flex: 1,
-    justifyContent: "center",
     alignItems: "center",
   },
 });
