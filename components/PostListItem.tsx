@@ -50,6 +50,27 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
 
   useEffect(() => {
     fetchLikeStatus();
+
+    const likesChannel = supabase
+      .channel(`likes-channel-${postItem.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "likes",
+          filter: `post_id=eq.${postItem.id}`,
+        },
+        (payload) => {
+          if (
+            payload.eventType === "INSERT" &&
+            payload.new.user_id !== user?.id
+          ) {
+            setLikeCount((prev) => prev + 1);
+          }
+        }
+      )
+      .subscribe();
   }, []);
 
   useEffect(() => {

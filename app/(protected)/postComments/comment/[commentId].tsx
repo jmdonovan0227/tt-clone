@@ -13,8 +13,8 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
-import { getComment } from "@/services/comments";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getComment, updateComment } from "@/services/comments";
 
 type EditCommentFormData = {
   comment: string;
@@ -26,11 +26,12 @@ const editCommentSchema = z.object({
 
 export default function EditComment() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { commentId } = useLocalSearchParams<{ commentId: string }>();
 
   const {
-    data: comment,
+    data,
     isLoading: isLoadingComment,
     isError: isErrorComment,
   } = useQuery({
@@ -39,21 +40,40 @@ export default function EditComment() {
     enabled: !!commentId,
   });
 
-  console.log("commentId: ", commentId);
-  console.log("comment: ", comment);
+  const updateCommentMutation = useMutation({
+    mutationFn: (updatedComment: string) =>
+      updateComment(commentId, updatedComment),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["comment", commentId] }),
+        queryClient.invalidateQueries({ queryKey: ["comments"] }),
+      ]);
+      router.back();
+    },
+  });
 
-  const { control, handleSubmit, setValue } = useForm<EditCommentFormData>({
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<EditCommentFormData>({
     resolver: zodResolver(editCommentSchema),
   });
 
   useEffect(() => {
-    if (comment) {
-      setValue("comment", comment.comment);
+    if (data) {
+      setValue("comment", data?.comment);
     }
-  }, [comment]);
+  }, [data]);
 
-  const onSubmit: SubmitHandler<EditCommentFormData> = (data) => {
-    console.log(data);
+  // update comment
+  const onSubmit: SubmitHandler<EditCommentFormData> = async (data) => {
+    try {
+      await updateCommentMutation.mutateAsync(data.comment);
+    } catch (error) {
+      console.error("Error updating comment: ", error);
+    }
   };
 
   if (isLoadingComment) {
@@ -104,12 +124,22 @@ export default function EditComment() {
             marginTop: 20,
           }}
         >
-          <TouchableOpacity style={styles.button} onPress={() => router.back()}>
+          <TouchableOpacity
+            style={styles.button}
+            disabled={isSubmitting}
+            onPress={() => router.back()}
+          >
             <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => router.back()}>
-            <Text style={styles.buttonText}>Save</Text>
+          <TouchableOpacity
+            style={styles.button}
+            disabled={isSubmitting || !!errors.comment}
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Text style={styles.buttonText}>
+              {isSubmitting ? "Saving..." : "Save"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
