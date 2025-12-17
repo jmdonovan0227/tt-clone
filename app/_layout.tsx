@@ -6,6 +6,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import * as SplashScreen from "expo-splash-screen";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { StatusBar } from "expo-status-bar";
 
 // prevent the splash screen from auto hiding while we wait for the store to be hydrated
 SplashScreen.preventAutoHideAsync();
@@ -59,15 +60,21 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider value={myTheme}>
-        <QueryClientProvider client={queryClient}>
-          <Stack>
-            <Stack.Screen name="(protected)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          </Stack>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <>
+      <StatusBar hidden={true} />
+      <SafeAreaProvider>
+        <ThemeProvider value={myTheme}>
+          <QueryClientProvider client={queryClient}>
+            <Stack>
+              <Stack.Screen
+                name="(protected)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            </Stack>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </>
   );
 }

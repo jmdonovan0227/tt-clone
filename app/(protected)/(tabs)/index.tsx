@@ -1,5 +1,4 @@
 import {
-  FlatList,
   View,
   Dimensions,
   ViewToken,
@@ -13,6 +12,7 @@ import { useMemo, useRef, useState } from "react";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import FeedTab from "@/components/GenericComponents/FeedTab";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { FlashList } from "@shopify/flash-list";
 import { fetchPosts } from "@/services/posts";
 
 const TABS = {
@@ -73,9 +73,7 @@ export default function HomeScreen() {
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
       />
     );
-  }
-
-  if (error) {
+  } else if (error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text
@@ -117,7 +115,7 @@ export default function HomeScreen() {
 
         <Ionicons name="search" size={24} color="black" />
       </View>
-      <FlatList
+      <FlashList
         data={posts}
         renderItem={({ item, index }) => (
           <PostListItem postItem={item} isActive={index === currentIndex} />
@@ -134,15 +132,7 @@ export default function HomeScreen() {
         onEndReached={() =>
           !isFetchingNextPage && hasNextPage && fetchNextPage()
         }
-        onEndReachedThreshold={2} // 2 spaces from the end.
-        getItemLayout={(data, index) => ({
-          length: height - (top + bottom),
-          offset: (height - (top + bottom)) * index,
-          index,
-        })} // this is used to improve the performance of the FlatList by providing a layout for the
-        initialNumToRender={3} // render 3 items initially (helps with performance)
-        maxToRenderPerBatch={3} // render 3 items per batch (helps with performance)
-        windowSize={5} // render 5 items before and after the current item (helps with performance)
+        onEndReachedThreshold={2} // 2 spaces from the end
       />
     </View>
   );

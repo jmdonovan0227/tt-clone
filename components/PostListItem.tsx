@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -13,6 +14,8 @@ import { useFocusEffect, Link } from "expo-router";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/useAuthStore";
+import * as Sharing from "expo-sharing";
+import { File, Directory, Paths } from "expo-file-system";
 
 type VideoItemProps = {
   postItem: Post;
@@ -25,6 +28,8 @@ type LikeRecord = {
   user_id: string;
   created_at: string;
 };
+
+const destinationPath = new Directory(Paths.cache, "videos");
 
 export default function PostListItem({ postItem, isActive }: VideoItemProps) {
   const { top, bottom } = useSafeAreaInsets();
@@ -39,6 +44,9 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeRecord, setLikeRecord] = useState<LikeRecord | null>(null);
   const [likeCount, setLikeCount] = useState(nrOfLikes?.[0]?.count || 0);
+  const [commentCount, setCommentCount] = useState(
+    nrOfComments?.[0]?.count || 0
+  );
   const isInitializing = useRef(true);
 
   const user = useAuthStore((state) => state.user);
@@ -51,8 +59,8 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
   useEffect(() => {
     fetchLikeStatus();
 
-    const likesChannel = supabase
-      .channel(`likes-channel-${postItem.id}`)
+    const likesAndCommentsChannel = supabase
+      .channel(`likes-and-comments-channel-${postItem.id}`)
       .on(
         "postgres_changes",
         {
@@ -70,12 +78,26 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
           }
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "comments",
+          filter: `post_id=eq.${postItem.id}`,
+        },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            setCommentCount((prev) => prev + 1);
+          }
+        }
+      )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(likesChannel);
+      supabase.removeChannel(likesAndCommentsChannel);
     };
-  }, []);
+  }, [user?.id, postItem.id]);
 
   useEffect(() => {
     if (isInitializing.current) {
@@ -189,6 +211,39 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
     }
   };
 
+  const sharePost = async () => {
+    try {
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (!isAvailable) {
+        Alert.alert("Sharing is not available on this device.");
+        return;
+      } else if (!video_url) {
+        Alert.alert("Post is not available.");
+        return;
+      }
+
+      if (!destinationPath.exists) {
+        destinationPath.create();
+      }
+
+      const fileName = `video_${postItem.id}.mp4`;
+      const file = new File(destinationPath, fileName);
+
+      if (file.exists) {
+        file.delete();
+      }
+
+      const output = await File.downloadFileAsync(video_url, file);
+
+      await Sharing.shareAsync(output.uri, {
+        mimeType: "video/mp4",
+        dialogTitle: "Share Video",
+      });
+    } catch (error) {
+      console.error("Error sharing post: ", error);
+    }
+  };
+
   return (
     <View
       style={{
@@ -217,18 +272,12 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         <Link href={`/postComments/${postItem.id}`} asChild>
           <TouchableOpacity style={styles.interactionButton}>
             <Ionicons name="chatbubble" size={33} color="white" />
-            <Text style={styles.interactionText}>
-              {nrOfComments?.[0]?.count || 0}
-            </Text>
+            <Text style={styles.interactionText}>{commentCount}</Text>
           </TouchableOpacity>
         </Link>
 
-        <TouchableOpacity
-          style={styles.interactionButton}
-          onPress={() => console.log("share")}
-        >
+        <TouchableOpacity style={styles.interactionButton} onPress={sharePost}>
           <Ionicons name="arrow-redo" size={33} color="white" />
-          <Text style={styles.interactionText}>{0}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
