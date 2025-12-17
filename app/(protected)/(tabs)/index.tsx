@@ -132,7 +132,7 @@ export default function HomeScreen() {
         onEndReached={() =>
           !isFetchingNextPage && hasNextPage && fetchNextPage()
         }
-        onEndReachedThreshold={2} // 2 spaces from the end.
+        onEndReachedThreshold={2} // 2 spaces from the end
       />
     </View>
   );

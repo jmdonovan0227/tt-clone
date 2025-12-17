@@ -97,7 +97,7 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
     return () => {
       supabase.removeChannel(likesAndCommentsChannel);
     };
-  }, []);
+  }, [user?.id, postItem.id]);
 
   useEffect(() => {
     if (isInitializing.current) {
