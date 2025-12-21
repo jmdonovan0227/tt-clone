@@ -1,6 +1,6 @@
 # TikTok Clone - Social Media App
 
-![App Screenshot](https://github.com/jmdonovan0227/tt-clone/blob/main/assets/images/Screenshot%202025-12-20%20at%205.51.41%E2%80%AFPM.png)
+![App Screenshot](./assets/images/app-preview-image.png)
 
 > Built with React Native & Expo to master real-time features and backend integration.
 > Based on notjustdev tt-clone.
@@ -32,6 +32,7 @@
 - **Code Review:** CodeRabbit
 
 ## 📱 Installation
+
 ```bash
 # Clone repository
 git clone https://github.com/jmdonovan0227/tt-clone.git
@@ -51,21 +52,25 @@ npm run android
 ## 💡 What I Learned
 
 **Database & Security**
+
 - Designed relational schema for users, posts, likes, and comments
 - Implemented Row Level Security policies to protect user-generated content
 - Managed database relationships and foreign key constraints
 
 **Real-time Features**
+
 - Set up Supabase Realtime channels for live updates
 - Handled optimistic UI updates for immediate user feedback
 - Synchronized state across multiple users viewing the same content
 
 **State Management**
+
 - Separated auth state (Zustand) from server state (TanStack Query)
 - Persisted auth sessions across app restarts
 - Managed complex form state with React Hook Form
 
 **Type Safety & Validation**
+
 - Generated TypeScript types from Supabase schema
 - Created Zod schemas for runtime validation
 - Prevented common bugs with strict typing
@@ -87,4 +92,5 @@ npm run android
 - For you, explore, and following sections
 
 ---
-*Tutorial by notjustdev:* [TikTok Clone Tutorial](https://www.youtube.com/watch?v=IxfnhAHnfCM)
+
+_Tutorial by notjustdev:_ [TikTok Clone Tutorial](https://www.youtube.com/watch?v=IxfnhAHnfCM)
