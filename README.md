@@ -3,7 +3,7 @@
 ![App Screenshot](https://github.com/jmdonovan0227/tt-clone/blob/main/assets/images/Screenshot%202025-12-20%20at%205.51.41%E2%80%AFPM.png)
 
 > Built with React Native & Expo to master real-time features and backend integration.
-> Based on [Tutorial Creator]'s course.
+> Based on notjustdev tt-clone.
 
 ## 🎯 Learning Goals
 
@@ -84,7 +84,7 @@ npm run android
 - Enhanced profile page with settings and user stats
 - Smooth animations using Reanimated
 - Push notifications for new likes/comments
-- For you, featured, and following sections
+- For you, explore, and following sections
 
 ---
 *Tutorial by notjustdev:* [TikTok Clone Tutorial](https://www.youtube.com/watch?v=IxfnhAHnfCM)
