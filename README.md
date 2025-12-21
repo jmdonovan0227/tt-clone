@@ -84,6 +84,7 @@ npm run android
 - Enhanced profile page with settings and user stats
 - Smooth animations using Reanimated
 - Push notifications for new likes/comments
+- For you, featured, and following sections
 
 ---
 *Tutorial by notjustdev:* [TikTok Clone Tutorial](https://www.youtube.com/watch?v=IxfnhAHnfCM)
