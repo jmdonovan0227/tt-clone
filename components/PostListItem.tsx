@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  Platform,
 } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -256,7 +257,12 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         style={{ flex: 1, marginBottom: 10 }}
       />
 
-      <View style={[styles.interactionBar, { bottom: bottom + 25 }]}>
+      <View
+        style={[
+          styles.interactionBar,
+          { bottom: Platform.OS === "android" ? bottom + 50 : bottom },
+        ]}
+      >
         <TouchableOpacity
           style={styles.interactionButton}
           onPress={() => setIsLiked(!isLiked)}
@@ -292,7 +298,12 @@ export default function PostListItem({ postItem, isActive }: VideoItemProps) {
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.videoInfo, { bottom: bottom + 25 }]}>
+      <View
+        style={[
+          styles.videoInfo,
+          { bottom: Platform.OS === "android" ? bottom + 50 : bottom },
+        ]}
+      >
         <Text style={styles.username}>{postUser?.username}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
