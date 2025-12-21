@@ -1,50 +1,89 @@
-# Welcome to your Expo app 👋
+# TikTok Clone - Social Media App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+![App Screenshot](https://github.com/jmdonovan0227/tt-clone/blob/main/assets/images/Screenshot%202025-12-20%20at%205.51.41%E2%80%AFPM.png)
 
-## Get started
+> Built with React Native & Expo to master real-time features and backend integration.
+> Based on [Tutorial Creator]'s course.
 
-1. Install dependencies
+## 🎯 Learning Goals
 
-   ```bash
-   npm install
-   ```
+- Master Supabase RLS policies, auth, and relational database design
+- Implement global auth state management with Zustand + Supabase Auth
+- Build real-time features using Supabase Realtime subscriptions
+- Create production-ready React Native components and screens
 
-2. Start the app
+## ✨ Key Features
 
-   ```bash
-   npx expo start
-   ```
+- Infinite scroll video feed with optimized performance
+- Video upload with cloud storage (Supabase)
+- User authentication (sign up/sign in)
+- Real-time likes and comments
+- Comment editing and deletion
+- Video sharing capability
+- User profiles
 
-In the output, you'll find options to open the app in a
+## 🛠️ Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Framework:** React Native (Expo)
+- **Backend:** Supabase (Auth, PostgreSQL, Storage, Realtime)
+- **State Management:** Zustand (auth), TanStack Query (server state)
+- **Validation:** React Hook Form + Zod
+- **Type Safety:** TypeScript
+- **Code Review:** CodeRabbit
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+## 📱 Installation
 ```bash
-npm run reset-project
+# Clone repository
+git clone https://github.com/jmdonovan0227/tt-clone.git
+
+# Install dependencies
+npm install
+
+# Configure environment variables by creating a .env file and adding env_example.txt variables
+
+# Run on iOS
+npm run ios
+
+# Run on Android
+npm run android
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 💡 What I Learned
 
-## Learn more
+**Database & Security**
+- Designed relational schema for users, posts, likes, and comments
+- Implemented Row Level Security policies to protect user-generated content
+- Managed database relationships and foreign key constraints
 
-To learn more about developing your project with Expo, look at the following resources:
+**Real-time Features**
+- Set up Supabase Realtime channels for live updates
+- Handled optimistic UI updates for immediate user feedback
+- Synchronized state across multiple users viewing the same content
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+**State Management**
+- Separated auth state (Zustand) from server state (TanStack Query)
+- Persisted auth sessions across app restarts
+- Managed complex form state with React Hook Form
 
-## Join the community
+**Type Safety & Validation**
+- Generated TypeScript types from Supabase schema
+- Created Zod schemas for runtime validation
+- Prevented common bugs with strict typing
 
-Join our community of developers creating universal apps.
+## 🔧 Key Modifications from Tutorial
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- ✅ Added **real-time likes and comments** with Supabase subscriptions
+- ✅ Implemented **video sharing** functionality
+- ✅ Integrated **React Hook Form + Zod** for type-safe form validation
+- ✅ Improved performance by switching from FlatList to **FlashList**
+
+## 🚀 Future Improvements
+
+- Friend system (add, view, remove friends)
+- Direct messaging with real-time inbox
+- Enhanced profile page with settings and user stats
+- Smooth animations using Reanimated
+- Push notifications for new likes/comments
+
+---
+*Tutorial by notjustdev:* [TikTok Clone Tutorial](https://www.youtube.com/watch?v=IxfnhAHnfCM)
